@@ -3,6 +3,25 @@
 
 EnhancedOres:
 
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+    #   Database connection arguments
+    #   Warning! Do not change (driver_class) if you have no idea what you're doing!
+    #
+    #   Those options are fully customizable. If you are not using MariaDB, look on internet
+    #   for other engines with these keywords -> "hibernate", "dialect","(your database engine)"
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+
+    database:
+        dialect:        MariaDBDialect  #org.hibernate.dialect.MariaDBDialect
+        address:        localhost    #jdbc:msql://83.168.108.1:3306/
+        port:           3306
+        database:       enhanced_ores
+
+        username:       root
+        password:       ""
+
+    # Economy item
+
     economy-item:
         material: GOLD_NUGGET
         item-meta:
@@ -20,6 +39,8 @@ EnhancedOres:
 
     ores:
         - GOLD
+    #   - IRON
+    #   - ...
 
     # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
     #   Minimum drop chance is "0" - 0%         // it will not change no matter what you do!

@@ -4,9 +4,9 @@
         <property name="hibernate.dialect">org.hibernate.dialect.MariaDBDialect</property>
         <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
 
-        <property name="hibernate.connection.url">jdbc:mysql://83.168.108.1:3306/s3295_enhanced_facilities</property>
-        <property name="hibernate.connection.username">u3295_QrhWZJKg6H</property>
-        <property name="hibernate.connection.password">SnpcUg7rT1E64^3.cqTFCGnn</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/enhanced_ores</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">""</property>
 
         <property name="hibernate.hbm2ddl.auto">update</property>
 

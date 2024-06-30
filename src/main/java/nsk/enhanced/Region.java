@@ -4,19 +4,24 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
-@Table(name = "eo_regions")
+@Table(name = "regions")
 public class Region implements Listener {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(nullable = false)
+    private String name;
 
     @Column(nullable = false)
     private double xA, yA, zA;
@@ -26,6 +31,9 @@ public class Region implements Listener {
 
     @Column(nullable = false)
     private String worldName;
+
+    @Transient
+    private UUID uuid;
 
 
     public Region() { /* Pusty konstruktor wymagany przez JPA */ }
@@ -49,6 +57,22 @@ public class Region implements Listener {
 
     // --- --- --- --- // Setter's / Getter's // --- --- --- --- //
 
+    public void setUser(Player player) {
+        uuid = player.getUniqueId();
+    }
+    public void setUser(UUID uuid) {
+        this.uuid = uuid;
+    }
+    public UUID getUser() {
+        return uuid;
+    }
+
+    public void resetUser() {
+        uuid = null;
+    }
+
+    // --- --- --- --- // Setter's / Getter's // --- --- --- --- //
+
     public int getId() {
         return id;
     }
@@ -64,16 +88,23 @@ public class Region implements Listener {
         return new Location(Bukkit.getWorld(worldName), xB, yB, zB);
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getName() {
+        return name;
+    }
+
     protected void setWorld(World world) {
         worldName = world.getName();
     }
 
-    protected void setPointA(Location pointA) {
+    public void setPointA(Location pointA) {
         this.xA = pointA.getX();
         this.yA = pointA.getY();
         this.zA = pointA.getZ();
     }
-    protected void setPointB(Location pointB) {
+    public void setPointB(Location pointB) {
         this.xB = pointB.getX();
         this.yB = pointB.getY();
         this.zB = pointB.getZ();
@@ -137,6 +168,16 @@ public class Region implements Listener {
 
     @Override
     public String toString() {
-        return "Region{" + "pointA=" + getPointA() + ", pointB=" + getPointB() + '}';
+
+        StringBuilder builder = new StringBuilder();
+        builder .append("\n")
+                .append("Region: ").append(this.getId()).append("\n")
+                .append("Name: ").append(this.getName()).append("\n")
+                .append("World: ").append(this.getWorld().getName()).append("\n")
+                .append("PointA:").append(" X: ").append(xA).append(" Y: ").append(yA).append(" Z: ").append(zA).append("\n")
+                .append("PointB:").append(" X: ").append(xB).append(" Y: ").append(yB).append(" Z: ").append(zB).append("\n")
+                .append("\n");
+
+        return builder.toString();
     }
 }

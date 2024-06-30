@@ -2,17 +2,16 @@ package nsk.enhanced;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import nsk.enhanced.Events.OnBlockInteractEvent;
+import nsk.enhanced.Events.OnBlockEvent;
 import nsk.enhanced.Events.OnPlayerInteractEvent;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -20,13 +19,16 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
@@ -34,7 +36,6 @@ public final class EnhancedOres extends JavaPlugin implements Listener {
 
     private File configFile;
     private FileConfiguration config;
-
     private SessionFactory sessionFactory;
 
     private final List<Region> regions = new ArrayList<>();
@@ -45,14 +46,16 @@ public final class EnhancedOres extends JavaPlugin implements Listener {
         loadConfiguration();
         sessionFactory = new Configuration().configure().buildSessionFactory();
 
+        configureHibernate();
         loadRegionsFromDatabase();
 
         // --- --- --- --- // Events Managers & Listeners // --- --- --- --- //
         // Events Listeners
         OnPlayerInteractEvent onPlayerInteractEvent = new OnPlayerInteractEvent();
-        OnBlockInteractEvent onBlockInteractEvent = new OnBlockInteractEvent();
-            getServer().getPluginManager().registerEvents(onPlayerInteractEvent,this);
-            getServer().getPluginManager().registerEvents(onBlockInteractEvent,this);
+        OnBlockEvent onBlockInteractEvent = new OnBlockEvent();
+
+        getServer().getPluginManager().registerEvents(onPlayerInteractEvent,this);
+        getServer().getPluginManager().registerEvents(onBlockInteractEvent,this);
 
         this.getCommand("eo").setExecutor(this);
         getServer().getPluginManager().registerEvents(this, this);
@@ -71,7 +74,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- //
 
-    public void loadConfiguration() {
+    private void loadConfiguration() {
         configFile = new File(getDataFolder(), "config.yml");
         if (!configFile.exists()) {
             configFile.getParentFile().mkdirs();
@@ -83,15 +86,44 @@ public final class EnhancedOres extends JavaPlugin implements Listener {
         boolean isEnabled = config.getBoolean("EnhancedOres.settings.enabled");
         getLogger().info("Plugin enabled: " + isEnabled);
     }
-    public FileConfiguration getConfigFile() {
+    private FileConfiguration getConfigFile() {
         return config;
     }
 
-    public void saveConfigFile() {
+    private void saveConfigFile() {
         try {
             config.save(configFile);
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, "Failed to save config file", e);
+        }
+    }
+
+    private void configureHibernate() {
+        try {
+            Yaml yaml = new Yaml();
+            try (InputStream in = getResource("config.yml")) {
+                Map<String, Object> config = yaml.load(in);
+
+                Map<String, String> databaseConfig = (Map<String, String>) config.get("database");
+
+                Configuration cfg = new Configuration()
+                        .setProperty("hibernate.dialect", "org.hibernate.dialect." + databaseConfig.get("dialect"))
+                        .setProperty("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver")
+
+                        .setProperty("hibernate.connection.url", "jdbc:msql://" + databaseConfig.get("address") + ":" + databaseConfig.get("port") + "/" + databaseConfig.get("database"))
+                        .setProperty("hibernate.connection.username", databaseConfig.get("username"))
+                        .setProperty("hibernate.connection.password", databaseConfig.get("password"))
+
+                        .setProperty("hibernate.hbm2ddl.auto", "update")
+                        .setProperty("hibernate.show_sql", "true")
+                        .setProperty("hibernate.format_sql", "true");
+
+                cfg.addAnnotatedClass(Region.class);
+
+                cfg.buildSessionFactory();
+            }
+        } catch (Exception e) {
+            PluginInstance.getInstance().consoleError(e);
         }
     }
 
@@ -119,11 +151,10 @@ public final class EnhancedOres extends JavaPlugin implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                //saveAllFactionsAsync(EnhancedOres.this);
                 try {
                     saveAllEntitiesFromListAsync(regions)
                         .exceptionally(e -> {
-                            throw new RuntimeException("Failed to save region into the database", e);
+                            throw new RuntimeException("Failed to save regions into the database", e);
                         }).get();
                 } catch (Exception e) {
                     consoleError(e);
@@ -247,6 +278,17 @@ public final class EnhancedOres extends JavaPlugin implements Listener {
         return item;
     }
 
+    public List<Material> getOres() {
+        List<String> materialName = config.getStringList("EnhancedOres.ores");
+        List<Material> materials = new ArrayList<>();
+
+        for (String material : materialName) {
+            materials.add(Material.getMaterial( material.toUpperCase() + "_ORE" ));
+        }
+
+        return materials;
+    }
+
     public List<Region> getRegions() {
         return regions;
     }
@@ -259,5 +301,147 @@ public final class EnhancedOres extends JavaPlugin implements Listener {
 
     public void consoleError(Exception e) {
         getLogger().log(Level.SEVERE, "Enhanced Ores error: ", e);
+    }
+
+    private static boolean isNumeric(String str) {
+        return str != null && str.matches("[0-9]+");
+    }
+
+
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (command.getName().equalsIgnoreCase("eo")) {
+
+            if (args.length == 0 && !sender.isOp()) {
+                sender.sendMessage("You don't have permission to use this command :(");
+                return false;
+            }
+
+            switch (args[0].toLowerCase()) {
+                case "region":
+                    if (sender instanceof Player) {
+                        Player player = (Player) sender;
+
+                        int n;
+
+                        switch (args[1].toLowerCase()) {
+                            case "check":
+
+                                Location l = player.getLocation();
+                                n = 0;
+
+                                for (Region region : regions) {
+                                    if (region.contains(l)) {
+                                        n++;
+                                        player.sendMessage(region.toString());
+                                    }
+                                }
+
+                                if (n <= 0) {
+                                    player.sendMessage("There are no regions in this place.");
+                                }
+                                break;
+
+                            case "open":
+
+                                if (args.length == 3) {
+
+                                    if ( isNumeric( args[2] ) ) {
+                                        for (Region region : regions) {
+                                            if ( String.valueOf( region.getId() ).equals( args[2] ) ) {
+                                                region.setUser(player);
+                                                player.sendMessage("Your region session is now open.");
+                                                break;
+                                            }
+                                        }
+
+                                    } else {
+                                        n = 0;
+
+                                        for (Region region : regions) {
+                                            if (region.getName().equalsIgnoreCase( args[2] )) {
+                                                n++;
+                                                region.setUser(player);
+                                                player.sendMessage("Your region session is now open.");
+                                                break;
+                                            }
+                                        }
+
+                                        if (n <= 0) {
+                                            try {
+                                                Region region = new Region();
+                                                region.setUser(player);
+
+                                                player.sendMessage("This region does not exist.");
+                                                player.sendMessage("Creating new region..");
+
+                                                regions.add(region);
+                                                saveEntityAsync(region)
+                                                        .thenRun(() -> {
+                                                            player.sendMessage("Your region session is now open.");
+                                                        })
+                                                        .exceptionally(e -> {
+                                                            regions.remove(region);
+                                                            throw new IllegalStateException("Query failed! ", e);
+                                                        });
+                                            } catch (Exception e) {
+                                                player.sendMessage("An error occurred while saving new region. Region was not created");
+                                                consoleError(e);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+
+                            case "close":
+
+                                for (Region region : regions) {
+                                    if (region.getUser().equals(player.getUniqueId())) {
+                                        region.resetUser();
+
+                                        player.sendMessage("Your region session is now closed.");
+                                        break;
+                                    }
+                                }
+
+                                player.sendMessage("You don't have any open session.");
+                                break;
+
+                            case "remove":
+                                if (args.length == 3) {
+
+                                    try {
+                                        for (Region region : regions) {
+                                            if (    String.valueOf( region.getId() ).equals( args[2] ) ||
+                                                    region.getName().equalsIgnoreCase(args[2])) {
+
+                                                deleteEntityAsync(region)
+                                                        .thenRun(() -> {
+                                                            regions.remove(region);
+                                                            player.sendMessage("Region is now removed.");
+                                                        })
+                                                        .exceptionally(e -> {
+                                                            throw new IllegalStateException("Query failed! ", e);
+                                                        });
+                                                break;
+                                            }
+                                        }
+
+                                    } catch (Exception e) {
+                                        player.sendMessage("An error occurred while removing region. Region was not removed");
+                                        consoleError(e);
+                                    }
+                                }
+                                break;
+                        }
+
+                    } else {
+                        sender.sendMessage("This command can only be executed by a player.");
+                    }
+                    return true;
+            }
+        }
+
+        return false;
     }
 }
