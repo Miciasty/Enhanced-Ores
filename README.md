@@ -92,6 +92,7 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
 
     - **drop-chance** - The chance (in percentage) for the economy item to drop. It can be set as an integer, float, or double. If the value is less than 1, it will be multiplied by 100. The minimum value is 0 (0%) and the maximum value is 100 (100%).
 
+
     ```yml
     drop-chance: 25
     ```
