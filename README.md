@@ -1,21 +1,21 @@
 ![Enhanced Ores](images/title.png)
-## Enhanced Ores
+# Enhanced Ores
 Enhanced Ores is a Minecraft plugin that allows users to configure custom items to drop from specific blocks with a set drop chance. It also enables the creation and management of regions where these drop mechanics are applied.
 
 Easy management, efficiently and configurably.
 
-### Getting Started
+## Getting Started
 
 - [Configuration](#configuration)
-- [Support](#support)
 - [Commands](#commands)
+- [Support](#support)
 - [Messages Styling](https://docs.advntr.dev/minimessage/format.html)
 
-### Configuration
+## Configuration
 
 To configure the Enhanced Ores plugin, edit the config.yml file located in the plugin's directory.
 
-- **Database Configuration**
+- ### Database Configuration
 
     This section configures the database connection parameters used by the plugin to store and retrieve data.
 
@@ -36,7 +36,7 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
         password:   ""
     ```
 
-- **Hibernate Configuration**
+- ### Hibernate Configuration
   
     This section contains Hibernate-specific settings.
 
@@ -51,7 +51,7 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
         sql_comments:   true
     ```
   
-- **Economy Item**
+- ### Economy Item
 
     This section configures the item that will be dropped from the specified ores.
 
@@ -70,7 +70,7 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
                 - <gray>[-] </gray><green>Usage -> </green><dark_green>Paying for plots, buying items.</dark_green>
     ```
 
-- **Ores Configuration**
+- ### Ores Configuration
 
     This section specifies which ores can drop the configured economy item.
 
@@ -84,7 +84,7 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
         - ...
     ```
 
-- **Drop Chance Configuration**
+- ### Drop Chance Configuration
 
     This section configures the drop chance for the economy item.
 
@@ -94,7 +94,7 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
     drop-chance: 25
     ```
 
-### Commands
+## Commands
 
 - `/eo list` Shows all existing regions showing their ID and Name
 
@@ -109,7 +109,7 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
 
 - `/eo region **remove** < id / name >` Removes existing region.
 
-### Support
+## Support
 
 For questions about Enhanced Ores, first try the ~~[Wiki](https://example.com/)~~ to see if your question is already answered there.
 If you can't find what you're looking for, contact me via Discord ***.n.u*** or ***❤ Miciasty ❤***
