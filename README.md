@@ -105,7 +105,7 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
 - `/eo region **open** < id / name >` Opening new session for Player if region exist, if not then the plugin will create a new one with given name.
 
     > [!NOTE]
-    > When Player has active session his every action, which are **[LEFT_CLICK]** and **[RIGHT_CLICK]** will be seen as new points A and B of the Region.
+  > When Player has active session his every action, which are **[LEFT_CLICK]** and **[RIGHT_CLICK]** will be seen as new points A and B of the Region.
 
 - `/eo region **close**` Closes Player's active session.
 
