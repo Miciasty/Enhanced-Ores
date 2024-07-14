@@ -9,8 +9,6 @@ Easy management, efficiently and configurably.
 - [Configuration](#configuration)
 - [Support](#support)
 - [Commands](#commands)
-
-
 - [Messages Styling](https://docs.advntr.dev/minimessage/format.html)
 
 ### Configuration
