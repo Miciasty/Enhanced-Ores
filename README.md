@@ -98,23 +98,18 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
 
 ### Commands
 
-Shows all existing regions showing their ID and Name
-> /eo list
+- `/eo list` Shows all existing regions showing their ID and Name
 
-Checks player's location and searching if any region contains it. If true, sending message with information about ID, Name, World, PointA, PointB of the Region.
-> /eo region **check**
+- `/eo region **check**` Checks player's location and searching if any region contains it. If true, sending message with information about ID, Name, World, PointA, PointB of the Region.
 
-Opening new session for Player if region exist, if not then the plugin will create a new one with given name.
-> [!NOTE]
-> When Player has active session his every action, which are **[LEFT_CLICK]** and **[RIGHT_CLICK]** will be seen as new points A and B of the Region.
+- `/eo region **open** < id / name >` Opening new session for Player if region exist, if not then the plugin will create a new one with given name.
 
-> /eo region **open** < id / name >
+    > [!NOTE]
+    > When Player has active session his every action, which are **[LEFT_CLICK]** and **[RIGHT_CLICK]** will be seen as new points A and B of the Region.
 
-Closes Player's active session.
-> /eo region **close**
+- `/eo region **close**` Closes Player's active session.
 
-Removes existing region.
-> /eo region **remove** < id / name >
+- `/eo region **remove** < id / name >` Removes existing region.
 
 ### Support
 
