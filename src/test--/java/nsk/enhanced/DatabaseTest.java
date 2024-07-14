@@ -1,6 +1,9 @@
-package nsk;
+/*
 
-import nsk.enhanced.Region;
+package nsk.enhanced;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -18,18 +21,22 @@ import javax.persistence.criteria.CriteriaQuery;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 
 public class DatabaseTest {
 
-    private List<Region> regions = new ArrayList<Region>();
+    private List<Region> regions = new ArrayList<>();
     private SessionFactory sessionFactory;
+
+
 
     @Test
     public void TestDatabase() {
 
         sessionFactory = new Configuration().configure().buildSessionFactory();
 
-        StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+        /*StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
                 .configure()
                 .build();
 
@@ -41,12 +48,16 @@ public class DatabaseTest {
         SessionFactory sessionFactory = metadata.buildSessionFactory();
         Session session = sessionFactory.openSession();
 
-        session.beginTransaction();
+        session.beginTransaction();*/
+
+/*
 
         loadRegionsFromDatabase();
 
-        System.out.println("Regions: " + regions.size());
+        getLogger().info("Regions: " + regions.size());
+
     }
+
 
     public void loadRegionsFromDatabase() {
         try (Session session = sessionFactory.openSession()) {
@@ -66,4 +77,21 @@ public class DatabaseTest {
         }
     }
 
+    public <T> CompletableFuture<Void> saveEntityAsync(T entity) {
+
+        return CompletableFuture.runAsync(() -> {
+            try (Session session = sessionFactory.openSession()) {
+                session.beginTransaction();
+
+                session.saveOrUpdate(entity);
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        });
+    }
+
 }
+
+ */

@@ -1,0 +1,48 @@
+
+# Enhanced Ores - Translations File
+
+EnhancedOres:
+
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+    #   Predefined color tags
+    #   Those 4 types of tags are allowed to use HEX and only HEX codes.
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+
+    tags:
+        error:      "#FF5555"
+        warning:    "#FFAA00"
+        success:    "#55FF55"
+        info:       "#5555FF"
+
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+    #   Messages translations
+    #
+    #   Those are the messages used by Enhanced Ores. You can use predefined tags such as:
+    #   - <error>   </error>
+    #   - <warning> </warning>
+    #   - <success> </success>
+    #   - <info>    </info>
+    #
+    #   You are also allowed to use every possible format you can find in Kyori Adventure's
+    #   MiniMessages under this link: https://docs.advntr.dev/minimessage/format.html
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+
+    messages:
+        onCooldown:         "<info>[i] <gray>You can't mine this until the cooldown ends."
+        onCoinFound:        "<success>[!] <gray>You have found a gold coin!"
+
+        prefixPointA:       "<dark_green>[A]: <gray>" # Output: [A]: world, xA, yA, zA
+        prefixPointB:       "<dark_aqua>[B]: <gray>" # Output: [B]: world, xA, yA, zA
+
+        permissionDenied:   "<error>You do not have permission to use that command!"
+        queryError:         "<error>An error occurred while saving new region. Region was not created"
+
+        notRegion:          "<info>There are no regions at this location."
+        notExistRegion:     "<error>This region does not exist."
+        emptyArgument:      "<error>You need to specify a region."
+        creatingRegion:     "<warning>Creating new region... <gray>" # Output: Creating new region... [Region_name]
+        removedRegion:      "<warning>Region is now removed."
+
+        sessionOpen:        "<success>Your region session is now open."
+        sessionClosed:      "<success>Your region session is now closed."
+        noSession:          "<warning>You don't have any open sessions."

@@ -1,4 +1,0 @@
-name: Enhanced Ores
-version: '${project.version}'
-main: nsk.enhanced.EnhancedOres
-api-version: '1.20'

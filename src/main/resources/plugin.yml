@@ -1,0 +1,12 @@
+name: EnhancedOres
+version: '${project.version}'
+main: nsk.enhanced.EnhancedOres
+api-version: '1.20'
+
+author: .n.u
+prefix: Enhanced Ores
+
+commands:
+    eo:
+        description: Main command for Enhanced Ores plugin.
+        usage: /eo region <check/open/close/remove> <argument>

@@ -20,16 +20,16 @@ public class Region implements Listener {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private double xA, yA, zA;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private double xB, yB, zB;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String worldName;
 
     @Transient
@@ -37,6 +37,15 @@ public class Region implements Listener {
 
 
     public Region() { /* Pusty konstruktor wymagany przez JPA */ }
+
+    public Region(Player player) {
+        try {
+            setWorld( player.getLocation().getWorld() );
+            setUser(player.getUniqueId());
+        } catch ( Exception e ) {
+            PluginInstance.getInstance().consoleError(e);
+        }
+    }
 
     public Region(Location pointA, Location pointB) {
 
@@ -84,8 +93,15 @@ public class Region implements Listener {
     public Location getPointA() {
         return new Location(Bukkit.getWorld(worldName), xA, yA, zA);
     }
+    public String getPointAString() {
+        return worldName + ", " + xA + ", " + yA + ", " + zA;
+    }
+
     public Location getPointB() {
         return new Location(Bukkit.getWorld(worldName), xB, yB, zB);
+    }
+    public String getPointBString() {
+        return worldName + ", " + xB + ", " + yB + ", " + zB;
     }
 
     public void setName(String name) {
@@ -104,6 +120,7 @@ public class Region implements Listener {
         this.yA = pointA.getY();
         this.zA = pointA.getZ();
     }
+
     public void setPointB(Location pointB) {
         this.xB = pointB.getX();
         this.yB = pointB.getY();
@@ -171,12 +188,11 @@ public class Region implements Listener {
 
         StringBuilder builder = new StringBuilder();
         builder .append("\n")
-                .append("Region: ").append(this.getId()).append("\n")
+                .append("Region ID: ").append(this.getId()).append("\n")
                 .append("Name: ").append(this.getName()).append("\n")
                 .append("World: ").append(this.getWorld().getName()).append("\n")
                 .append("PointA:").append(" X: ").append(xA).append(" Y: ").append(yA).append(" Z: ").append(zA).append("\n")
-                .append("PointB:").append(" X: ").append(xB).append(" Y: ").append(yB).append(" Z: ").append(zB).append("\n")
-                .append("\n");
+                .append("PointB:").append(" X: ").append(xB).append(" Y: ").append(yB).append(" Z: ").append(zB).append("\n");
 
         return builder.toString();
     }
