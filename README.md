@@ -5,7 +5,7 @@ Enhanced Ores is a Minecraft plugin that allows users to configure custom items 
 Easy management, efficiently and configurably.
 
 ### Getting Started
-****
+
 - [Configuration](#configuration)
 - [Support](#support)
 - [Commands](#commands)
@@ -14,7 +14,7 @@ Easy management, efficiently and configurably.
 - [Messages Styling](https://docs.advntr.dev/minimessage/format.html)
 
 ### Configuration
-****
+
 To configure the Enhanced Ores plugin, edit the config.yml file located in the plugin's directory.
 
 - **Database Configuration**
@@ -27,7 +27,7 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
     - **database** - The name of the database.
     - **username** - The username used to connect to the database.
     - **password** - The password used to connect to the database.
-
+    <br></br>
     ```yml
     database:
         dialect:    MySQL8Dialect
@@ -45,7 +45,7 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
     - **show_sql** - If set to true, SQL statements will be logged to the console.
     - **format_sql** - If set to true, SQL statements will be formatted.
     - **sql_comments** - If set to true, SQL comments will be included in the logged SQL statements.
-
+    <br></br>
     ```yml
     hibernate:
         show_sql:       false
@@ -61,7 +61,7 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
     - **item-meta** - Contains metadata for the item.
     - **display-name** - The display name of the item.
     - **lore** - A list of lore lines for the item.
-  
+    <br></br>
     ```yml
     economy-item:
         material: GOLD_NUGGET
@@ -77,7 +77,7 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
     This section specifies which ores can drop the configured economy item.
 
     - **ores** - A list of ores from which the economy item can drop. Only blocks whose names end with **_ORE** can be used.
-  
+    <br></br>
     ```yml
     ores:
         - DEEPSLATE_GOLD
@@ -91,14 +91,13 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
     This section configures the drop chance for the economy item.
 
     - **drop-chance** - The chance (in percentage) for the economy item to drop. It can be set as an integer, float, or double. If the value is less than 1, it will be multiplied by 100. The minimum value is 0 (0%) and the maximum value is 100 (100%).
-
-
+    <br></br>
     ```yml
     drop-chance: 25
     ```
 
 ### Commands
-****
+
 Shows all existing regions showing their ID and Name
 > /eo list
 
@@ -118,6 +117,6 @@ Removes existing region.
 > /eo region **remove** < id / name >
 
 ### Support
-****
+
 For questions about Enhanced Ores, first try the ~~[Wiki](https://example.com/)~~ to see if your question is already answered there.
 If you can't find what you're looking for, contact me via Discord ***.n.u*** or ***❤ Miciasty ❤***
