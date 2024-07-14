@@ -1,5 +1,5 @@
 ![Enhanced Ores](images/title.png)
-## Enhanced Ores t
+## Enhanced Ores
 Enhanced Ores is a Minecraft plugin that allows users to configure custom items to drop from specific blocks with a set drop chance. It also enables the creation and management of regions where these drop mechanics are applied.
 
 Easy management, efficiently and configurably.
