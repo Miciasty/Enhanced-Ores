@@ -14,6 +14,7 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -47,7 +48,7 @@ public class OnBlockEvent implements Listener {
         return random.nextDouble() * 100 < drop_chance;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
 
         Player player = event.getPlayer();
@@ -95,6 +96,8 @@ public class OnBlockEvent implements Listener {
                             player.sendMessage(message);
                         }
                     }
+
+                    event.setCancelled(true);
                 }
             }
         }
