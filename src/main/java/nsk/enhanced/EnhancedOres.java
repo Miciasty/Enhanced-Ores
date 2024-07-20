@@ -9,6 +9,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import nsk.enhanced.Events.OnBlockEvent;
 import nsk.enhanced.Events.OnPlayerInteractEvent;
+import nsk.enhanced.System.EnhancedLogger;
 import nsk.enhanced.Tags.Annotations;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -38,8 +39,11 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class EnhancedOres extends JavaPlugin implements Listener, CommandExecutor {
+
+    private EnhancedLogger enhancedLogger;
 
     private File configFile;
     private FileConfiguration config;
@@ -57,9 +61,11 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
 
         PluginInstance.setInstance(this);
 
-        getLogger().info("Loading configuration...");
+        enhancedLogger = new EnhancedLogger(this);
+
+        enhancedLogger.info("test");
+
         loadConfiguration();
-        getLogger().info("Loading translations...");
         loadTranslations();
 
         configureHibernate();
@@ -70,46 +76,52 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
         OnPlayerInteractEvent onPlayerInteractEvent = new OnPlayerInteractEvent();
         OnBlockEvent onBlockInteractEvent = new OnBlockEvent();
 
-        getServer().getPluginManager().registerEvents(onPlayerInteractEvent, this);
-        getLogger().info("onPlayerInteractEvent registered");
-        getServer().getPluginManager().registerEvents(onBlockInteractEvent, this);
-        getLogger().info("onBlockInteractEvent registered");
+
+        try {
+            getServer().getPluginManager().registerEvents(onPlayerInteractEvent, this);
+            enhancedLogger.fine("onPlayerInteractEvent registered");
+        } catch (Exception e) {
+            enhancedLogger.severe("Registration onPlayerInteractEvent failed. - " + e.getMessage());
+        }
+
+        try {
+            getServer().getPluginManager().registerEvents(onBlockInteractEvent, this);
+            enhancedLogger.fine("onBlockInteractEvent registered");
+        } catch (Exception e) {
+            enhancedLogger.severe("Registration onBlockInteractEvent failed. - " + e.getMessage());
+        }
 
         PluginCommand command = this.getCommand("eo");
         if (command != null) {
             command.setExecutor(this);
-            getLogger().info("Commands registered");
+            enhancedLogger.fine("Commands registered");
         } else {
-            getLogger().info("Command 'eo' is not registered");
+            enhancedLogger.severe("Command 'eo' is not registered");
         }
 
         getServer().getPluginManager().registerEvents(this, this);
 
-        Component EF_L1 = MiniMessage.miniMessage().deserialize("<gradient:#9953aa:#172d5d>[Enhanced Ores]");
-
-        getServer().getConsoleSender().sendMessage(EF_L1);
-
         startAutoSaveTask();
         startMinerCheckTask();
 
-        getLogger().info("AutoSave loop started");
+        enhancedLogger.info("AutoSave loop started");
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("Preparing to save all regions...");
+        enhancedLogger.warning("Preparing to save all regions...");
         int maxAttempts = 9;
 
         try {
             saveAllEntitiesWithRetry(regions, maxAttempts).thenAccept(result -> {
                 if (result) {
-                    getLogger().info("Saved all regions successfully");
+                    enhancedLogger.fine("Saved all regions successfully");
                 } else {
-                    getLogger().info("Saved all regions failed after " + maxAttempts + " attempts");
+                    enhancedLogger.severe("Saved all regions failed after " + maxAttempts + " attempts");
                 }
             }).get();
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Failed to save all regions after " + maxAttempts + " attempts ", e);
+            enhancedLogger.severe("Failed to save all regions after " + maxAttempts + " attempts. - " + e);
         }
     }
 
@@ -163,7 +175,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- //
 
     private void loadConfiguration() {
-        getLogger().info("Loading configuration...");
+        enhancedLogger.warning("Loading configuration...");
         configFile = new File(getDataFolder(), "config.yml");
         if (!configFile.exists()) {
             configFile.getParentFile().mkdirs();
@@ -172,8 +184,8 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
 
         config = YamlConfiguration.loadConfiguration(configFile);
 
-        boolean isEnabled = config.getBoolean("EnhancedOres.settings.enabled");
-        getLogger().info("Config enabled: " + isEnabled);
+        //boolean isEnabled = config.getBoolean("EnhancedOres.settings.enabled");
+        //enhancedLogger.info("Config enabled: " + isEnabled);
     }
 
     private FileConfiguration getConfigFile() {
@@ -183,12 +195,12 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
         try {
             config.save(configFile);
         } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Failed to save config file", e);
+            enhancedLogger.log(Level.SEVERE, "Failed to save config file", e);
         }
     }
 
     private void loadTranslations() {
-        getLogger().info("Loading translations...");
+        enhancedLogger.warning("Loading translations...");
         translationsFile = new File(getDataFolder(), "translations.yml");
         if (!translationsFile.exists()) {
             translationsFile.getParentFile().mkdirs();
@@ -197,8 +209,8 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
 
         translations = YamlConfiguration.loadConfiguration(translationsFile);
 
-        boolean isEnabled = translations.getBoolean("EnhancedOres.settings.enabled");
-        getLogger().info("Translations enabled: " + isEnabled);
+        //boolean isEnabled = translations.getBoolean("EnhancedOres.settings.enabled");
+        //enhancedLogger.info("Translations enabled: " + isEnabled);
     }
 
     public FileConfiguration getTranslationsFile() {
@@ -206,7 +218,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
     }
 
     private void configureHibernate() {
-        getLogger().info("Configuring Hibernate...");
+        enhancedLogger.warning("Configuring Hibernate...");
         try {
             String dialect  = config.getString("EnhancedOres.database.dialect");
 
@@ -243,15 +255,15 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
             }
 
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Could not create session factory", e);
+            enhancedLogger.severe("Could not create session factory - " + e.getMessage());
         }
-        getLogger().info("Hibernate loaded");
+        enhancedLogger.fine("Hibernate loaded");
     }
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- //
 
     private void loadRegionsFromDatabase() {
-        getLogger().info("Loading regions from database...");
+        enhancedLogger.warning("Loading regions from database...");
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
 
@@ -265,9 +277,9 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
             session.getTransaction().commit();
 
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Could not load regions from database", e);
+            enhancedLogger.severe("Could not load regions from database - " + e.getMessage());
         }
-        getLogger().info("Regions loaded");
+        enhancedLogger.fine("Regions loaded");
     }
 
     private void startAutoSaveTask() {
@@ -275,15 +287,15 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
             @Override
             public void run() {
                 try {
-                    getLogger().info("Starting auto save task");
+                    enhancedLogger.warning("Starting auto save task");
                     saveAllEntitiesFromListAsync(regions)
                         .exceptionally(e -> {
                             throw new RuntimeException("Failed to save regions into the database", e);
                         }).get();
                 } catch (Exception e) {
-                    consoleError(e);
+                    enhancedLogger.severe("Failed to start auto save task - " + e.getMessage());
                 }
-                getLogger().info("Auto save task completed");
+                enhancedLogger.fine("Auto save task completed");
             }
         }.runTaskTimerAsynchronously(this,0L, 20L * 60 * 15);
     }
@@ -298,37 +310,32 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- //
 
     private <T> void saveEntity(T entity) {
-        getLogger().info("Preparing to save entity: " + entity.getClass().getSimpleName());
+        enhancedLogger.warning("Preparing to save entity: " + entity.getClass().getSimpleName());
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
 
-            getLogger().info("Saving entity: " + entity.getClass().getSimpleName());
+            enhancedLogger.info("Saving entity: " + entity.getClass().getSimpleName());
             session.saveOrUpdate(entity);
             session.getTransaction().commit();
-            getLogger().info("Saved entity: " + entity.getClass().getSimpleName());
+            enhancedLogger.fine("Saved entity: " + entity.getClass().getSimpleName());
         } catch (Exception e) {
-            this.consoleError(e);
-            getLogger().info("Saving entity failed");
+            enhancedLogger.severe("Saving entity failed - " + e.getMessage());
         }
     }
     public <T> CompletableFuture<Void> saveEntityAsync(T entity) {
 
         return CompletableFuture.runAsync(() -> {
-            getLogger().info("Saving entity: " + entity);
+            enhancedLogger.warning("Saving entity: " + entity);
             try (Session session = sessionFactory.openSession()) {
-                getLogger().info("Opened Hibernate session for entity");
                 session.beginTransaction();
-                getLogger().info("Transaction begun");
 
+                enhancedLogger.info("Saving entity: " + entity.getClass().getSimpleName());
                 session.saveOrUpdate(entity);
-                getLogger().info("Entity saveOrUpdate called");
-
                 session.getTransaction().commit();
-                getLogger().info("Transaction committed");
+                enhancedLogger.fine("Saved entity: " + entity.getClass().getSimpleName());
                 session.close();
             } catch (Exception e) {
-                getLogger().log(Level.SEVERE, "Failed to save entity", e);
-                this.consoleError(e);
+                enhancedLogger.severe("Saving entity failed - " + e.getMessage());
             }
 
         });
@@ -336,18 +343,20 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
     public <T> CompletableFuture<Void> saveAllEntitiesFromListAsync(List<T> entities) {
 
         return CompletableFuture.runAsync(() -> {
-            getLogger().info("Saving entities from the list: " + entities);
+            enhancedLogger.warning("Saving entities from the list: " + entities);
             try (Session session = sessionFactory.openSession()) {
                 session.beginTransaction();
 
                 for (T entity : entities) {
+                    enhancedLogger.info("Saving entity: " + entity.getClass().getSimpleName());
                     session.saveOrUpdate(entity);
                 }
 
                 session.getTransaction().commit();
+                enhancedLogger.fine("Saved entities from the list: " + entities);
                 session.close();
             } catch (Exception e) {
-                this.consoleError(e);
+                enhancedLogger.severe("Saving entities failed - " + e.getMessage());
             }
         });
     }
@@ -357,10 +366,10 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
             if (ex == null) {
                 return CompletableFuture.completedFuture(true);
             } else if (maxAttempts > 1) {
-                getLogger().log(Level.WARNING, "Save failed, retrying... Attempts left: " + maxAttempts);
+                enhancedLogger.warning("Save failed, retrying... Attempts left: " + maxAttempts);
                 return saveAllEntitiesWithRetry(entities, maxAttempts - 1);
             } else {
-                getLogger().log(Level.SEVERE, "Save failed after maximum attempts: " + ex);
+                enhancedLogger.severe("Save failed after maximum attempts: " + ex);
                 return CompletableFuture.completedFuture(false);
             }
         }).thenCompose(result -> result);
@@ -368,45 +377,52 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
     }
 
     private <T> void deleteEntity(T entity) {
+        enhancedLogger.warning("Preparing to delete entity: " + entity.getClass().getSimpleName());
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
 
+            enhancedLogger.info("Deleting entity: " + entity.getClass().getSimpleName());
             session.delete(entity);
             session.getTransaction().commit();
+            enhancedLogger.fine("Deleted entity: " + entity.getClass().getSimpleName());
         } catch (Exception e) {
-            this.consoleError(e);
+            enhancedLogger.severe("Deleting entity failed - " + e.getMessage());
         }
     }
     public <T> CompletableFuture<Void> deleteEntityAsync(T entity) {
 
         return CompletableFuture.runAsync(() -> {
-            getLogger().info("Deleting entity: " + entity);
+            enhancedLogger.warning("Preparing to delete entity: " + entity.getClass().getSimpleName());
             try (Session session = sessionFactory.openSession()) {
                 session.beginTransaction();
 
+                enhancedLogger.info("Deleting entity: " + entity.getClass().getSimpleName());
                 session.delete(entity);
                 session.getTransaction().commit();
+                enhancedLogger.fine("Deleted entity: " + entity.getClass().getSimpleName());
                 session.close();
             } catch (Exception e) {
-                this.consoleError(e);
+                enhancedLogger.severe("Deleting entity failed - " + e.getMessage());
             }
         });
     }
     public <T> CompletableFuture<Void> deleteAllEntitiesFromListAsync(List<T> entities) {
 
         return CompletableFuture.runAsync(() -> {
-            getLogger().info("Deleting entities from the list: " + entities);
+            enhancedLogger.warning("Preparing to delete entities from the list: " + entities);
             try (Session session = sessionFactory.openSession()) {
                 session.beginTransaction();
 
                 for (T entity : entities) {
+                    enhancedLogger.info("Deleting entity: " + entity.getClass().getSimpleName());
                     session.delete(entity);
                 }
 
                 session.getTransaction().commit();
+                enhancedLogger.fine("Deleted entities from the list: " + entities);
                 session.close();
             } catch (Exception e) {
-                this.consoleError(e);
+                enhancedLogger.severe("Deleting entities failed - " + e.getMessage());
             }
         });
     }
@@ -464,7 +480,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
     }
 
     public void consoleError(Exception e) {
-        getLogger().log(Level.SEVERE, "Error: ", e);
+        enhancedLogger.log(Level.SEVERE, "Error: ", e);
     }
 
     private static boolean isNumeric(String str) {
@@ -499,13 +515,13 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
 
                     for (Region region : regions) {
                         list.append("[").append(region.getId()).append("] - ");
-                        list.append(region.getName()).append("]\n");
+                        list.append(region.getName()).append("\n");
                     }
 
                     if (sender instanceof Player) {
                         sender.sendMessage(list.toString());
                     } else {
-                        getLogger().info(list.toString());
+                        enhancedLogger.info(list.toString());
                     }
 
                     break;
@@ -564,6 +580,15 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                     if ( isNumeric( args[2] ) ) {
                                         for (Region region : regions) {
                                             if ( String.valueOf( region.getId() ).equals( args[2] ) ) {
+
+                                                for (Region region2 : regions) {
+                                                    if (region2.getUser() != null && region2.getUser().equals(player.getUniqueId())) {
+                                                        enhancedLogger.info("User has already active session");
+                                                        region2.resetUser();
+                                                        enhancedLogger.info("Removed user from previous session.");
+                                                    }
+                                                }
+
                                                 region.setUser(player);
                                                 Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.sessionOpen"),
                                                         Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
@@ -594,6 +619,13 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
 
                                         if (n <= 0) {
                                             try {
+
+                                                for (Region region : regions) {
+                                                    if (region.getUser() != null && region.getUser().equals(player.getUniqueId())) {
+                                                        region.resetUser();
+                                                    }
+                                                }
+
                                                 Region region = new Region(player);
                                                 region.setName( args[2] );
                                                 region.setUser(player);
@@ -618,11 +650,9 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                                                     Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                                     Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
                                                                     Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") ))));
-                                                            getLogger().info("Region was successfully added to database.");
                                                         })
                                                         .exceptionally(e -> {
                                                             regions.remove(region);
-                                                            getLogger().info(region.getName() + " has beed removed.");
                                                             throw new IllegalStateException("Query failed! ", e);
                                                         });
                                             } catch (Exception e) {
@@ -631,7 +661,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                                         Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                         Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
                                                         Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") ))));
-                                                consoleError(e);
+                                                enhancedLogger.severe(e.getMessage());
                                                 break;
                                             }
                                         }
@@ -648,8 +678,9 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                             case "close":
 
                                 try {
+
                                     for (Region region : regions) {
-                                        if (region.getUser().equals(player.getUniqueId())) {
+                                        if (region.getUser() != null && region.getUser().equals(player.getUniqueId())) {
                                             region.resetUser();
 
                                             player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.sessionClosed"),
@@ -660,6 +691,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                             break;
                                         }
                                     }
+
                                 } catch (Exception e) {
                                     player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.noSession"),
                                             Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
@@ -709,7 +741,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                                 Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                 Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
                                                 Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") ))));
-                                        consoleError(e);
+                                        enhancedLogger.severe(e.getMessage());
                                     }
                                 } else {
                                     player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.emptyArgument"),
@@ -730,4 +762,10 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
 
         return false;
     }
+
+
+    /*@Override
+    public Logger enhancedLogger {
+        return enhancedLogger;
+    }*/
 }

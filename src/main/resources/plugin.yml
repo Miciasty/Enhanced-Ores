@@ -9,4 +9,4 @@ prefix: Enhanced Ores
 commands:
     eo:
         description: Main command for Enhanced Ores plugin.
-        usage: /eo region <check/open/close/remove> <argument>
+        usage: /eo <list/region> <check/open/close/remove> <argument>
