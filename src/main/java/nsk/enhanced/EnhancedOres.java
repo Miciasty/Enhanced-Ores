@@ -764,8 +764,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
     }
 
 
-    /*@Override
-    public Logger enhancedLogger {
+    public EnhancedLogger getEnhancedLogger() {
         return enhancedLogger;
-    }*/
+    }
 }

@@ -61,7 +61,7 @@ public class OnPlayerInteractEvent implements Listener {
                                                 throw new IllegalStateException("Query failed!", e);
                                             });
                                 } catch (Exception e) {
-                                    PluginInstance.getInstance().getLogger().severe(e.getMessage());
+                                    PluginInstance.getInstance().getEnhancedLogger().severe(e.getMessage());
                                 }
                                 break;
 
@@ -85,7 +85,7 @@ public class OnPlayerInteractEvent implements Listener {
                                                     throw new IllegalStateException("Query failed!", e);
                                                 });
                                     } catch (Exception e) {
-                                        PluginInstance.getInstance().getLogger().severe(e.getMessage());
+                                        PluginInstance.getInstance().getEnhancedLogger().severe(e.getMessage());
                                     }
                                 }
                                 break;

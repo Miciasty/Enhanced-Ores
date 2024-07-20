@@ -43,7 +43,7 @@ public class Region implements Listener {
             setWorld( player.getLocation().getWorld() );
             setUser(player.getUniqueId());
         } catch ( Exception e ) {
-            PluginInstance.getInstance().getLogger().severe(e.getMessage());
+            PluginInstance.getInstance().getEnhancedLogger().severe(e.getMessage());
         }
     }
 
@@ -60,7 +60,7 @@ public class Region implements Listener {
 
             }
         } catch (Exception e) {
-            PluginInstance.getInstance().getLogger().severe(e.getMessage());
+            PluginInstance.getInstance().getEnhancedLogger().severe(e.getMessage());
         }
     }
 
