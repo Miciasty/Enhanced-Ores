@@ -9,4 +9,8 @@ prefix: Enhanced Ores
 commands:
     eo:
         description: Main command for Enhanced Ores plugin.
-        usage: /eo <list/region> <check/open/close/remove> <argument>
+        usage: |
+            /eo help - To list all commands.
+            /eo reload - Reload the configuration files.
+            /eo list - List all regions.
+            /eo region - Manage regions.

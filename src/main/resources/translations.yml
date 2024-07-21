@@ -28,21 +28,23 @@ EnhancedOres:
     # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
 
     messages:
-        onCooldown:         "<info>[i] <gray>You can't mine this until the cooldown ends."
-        onCoinFound:        "<success>[!] <gray>You have found a gold coin!"
+        onCooldown:             "<info>[i] <gray>You can't mine this until the cooldown ends."
+        onCoinFound:            "<success>[!] <gray>You have found a gold coin!"
 
-        prefixPointA:       "<dark_green>[A]: <gray>" # Output: [A]: world, xA, yA, zA
-        prefixPointB:       "<dark_aqua>[B]: <gray>" # Output: [B]: world, xA, yA, zA
+        configReloadSuccess:    "<success>Config reloaded successfully!"
 
-        permissionDenied:   "<error>You do not have permission to use that command!"
-        queryError:         "<error>An error occurred while saving new region. Region was not created"
+        prefixPointA:           "<dark_green>[A]: <gray>" # Output: [A]: world, xA, yA, zA
+        prefixPointB:           "<dark_aqua>[B]: <gray>" # Output: [B]: world, xA, yA, zA
 
-        notRegion:          "<info>There are no regions at this location."
-        notExistRegion:     "<error>This region does not exist."
-        emptyArgument:      "<error>You need to specify a region."
-        creatingRegion:     "<warning>Creating new region... <gray>" # Output: Creating new region... [Region_name]
-        removedRegion:      "<warning>Region is now removed."
+        permissionDenied:       "<error>You do not have permission to use that command!"
+        queryError:             "<error>An error occurred while saving new region. Region was not created"
 
-        sessionOpen:        "<success>Your region session is now open."
-        sessionClosed:      "<success>Your region session is now closed."
-        noSession:          "<warning>You don't have any open sessions."
+        notRegion:              "<info>There are no regions at this location."
+        notExistRegion:         "<error>This region does not exist."
+        emptyArgument:          "<error>You need to specify a region."
+        creatingRegion:         "<warning>Creating new region... <gray>" # Output: Creating new region... [Region_name]
+        removedRegion:          "<warning>Region is now removed."
+
+        sessionOpen:            "<success>Your region session is now open."
+        sessionClosed:          "<success>Your region session is now closed."
+        noSession:              "<warning>You don't have any open sessions."

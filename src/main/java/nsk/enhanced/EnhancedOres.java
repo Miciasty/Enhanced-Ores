@@ -217,6 +217,20 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
         return translations;
     }
 
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- //
+
+    private void reloadConfiguration() {
+        try {
+            loadTranslations();
+            loadConfiguration();
+            enhancedLogger.fine("Reloaded configuration");
+        } catch (Exception e) {
+            enhancedLogger.severe("Failed to reload configuration. - " + e);
+        }
+    }
+
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- //
+
     private void configureHibernate() {
         enhancedLogger.warning("Configuring Hibernate...");
         try {
@@ -487,12 +501,27 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
         return str != null && str.matches("[0-9]+");
     }
 
+    private String getHelp() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("<gold>EnhancedOres Usage:</gold>\n")
+                .append(" - /eo list - List all regions.\n")
+                .append(" - /eo reload - Reload configuration.\n")
+                .append(" - /eo region <green>[argument]</green> - Manage regions.\n")
+                .append("   - <green><hover:show_text:'<yellow>/eo region check</yellow><gray> - Checks if region contain location.</gray>'>[check]</hover></green> - Hover me for more info.\n")
+                .append("   - <green><hover:show_text:'<yellow>/eo region open [id/name]</yellow><gray> - Open/Create region session.</gray>'>[open] [id/name]</hover></green> - Hover me for more info.\n")
+                .append("   - <green><hover:show_text:'<yellow>/eo region close</yellow><gray> - Close all player`s sessions.</gray>'>[close]</hover></green> - Hover me for more info.\n")
+                .append("   - <green><hover:show_text:'<yellow>/eo region remove [id/name]</yellow><gray> - Remove region.</gray>'>[remove] [id/name]</hover></green> - Hover me for more info.");
+
+        return stringBuilder.toString();
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("eo")) {
 
             if (args.length == 0) {
-                // plugin.yml -> command usage will do the work :)
+                Component help = MiniMessage.miniMessage().deserialize(getHelp());
+                sender.sendMessage(help);
                 return false;
             }
 
@@ -503,10 +532,29 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                         Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
                         Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") )));
                 sender.sendMessage(message);
-                return false;
+                return true;
             }
 
             switch (args[0].toLowerCase()) {
+
+                case "help":
+
+                    Component help = MiniMessage.miniMessage().deserialize(getHelp());
+                    sender.sendMessage(help);
+
+                    break;
+
+                case "reload":
+                    reloadConfiguration();
+
+                    Component reload = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.configReloadSuccess"),
+                            Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
+                            Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
+                            Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
+                            Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") )));
+                    sender.sendMessage(reload);
+
+                    break;
 
                 case "list":
                     StringBuilder list = new StringBuilder();
@@ -533,6 +581,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                         int n;
 
                         switch (args[1].toLowerCase()) {
+
                             case "check":
 
                                 Location l = player.getLocation();
@@ -751,13 +800,24 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                             Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") ))));
                                 }
                                 break;
+
+                            default:
+                                Component help2 = MiniMessage.miniMessage().deserialize(getHelp());
+                                sender.sendMessage(help2);
+                                return true;
                         }
 
                     } else {
                         sender.sendMessage("[!] This command can only be executed by a player [!]");
                     }
                     return true;
+
+                default:
+                    Component help2 = MiniMessage.miniMessage().deserialize(getHelp());
+                    sender.sendMessage(help2);
+                    return true;
             }
+            return true;
         }
 
         return false;
