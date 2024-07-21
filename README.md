@@ -97,6 +97,27 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
     cooldown: 2000
     ```
 
+---
+
+- ### Tools Effects Configuration
+
+    This section configures the effects that tools can have on the drop rate of economy items. Effects are based on lore strings that describe the bonuses.
+
+    - **translation_ore** - This subsection contains translations for different ore names. It maps the names used in lore to the corresponding material types in the game.
+    - **translation_action** - This subsection contains translations for different actions. It maps the names used in lore to the corresponding actions recognized by the plugin.
+    <br></br>
+  
+    ```yml
+    # Translations for Ores
+    translation_ore:
+        "bryły złota":      "GOLDEN_ORE"
+        "żelazna ruda":     "IRON_ORE"
+  
+    # Translations for Actions
+    translation_action:
+        "wydobycie":        "drop rate"
+    ```
+
 ## Commands
 
 - `/eo help` Shows all existing commands

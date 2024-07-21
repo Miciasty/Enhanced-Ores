@@ -1,0 +1,55 @@
+# Enhanced Ores - Tools Effect File
+
+EnhancedOres:
+
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+    #   Basically you are writing here Keywords for plugin, thanks to that it will know
+    #   what to do later.
+    #
+    #   This algorithm works with 2 variables [OreKey], [ActionKey] you can mix them in sentences.
+    #   What important is that those 2 keywords are building a 'sentence' that you
+    #   have to close using '%' for example:
+    #
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+    #   Example lore sentence: Zwiększa `wydobycie` z `bloków złota` o `+15%`                       #
+    #                                                                                          #
+    #   translation_ore:                                                                       #
+    #       "bloków złota":     "GOLDEN_ORE"                                                   #
+    #                                                                                          #
+    #   translation_action:                                                                    #
+    #       "wydobycie":        "drop rate"                                                    #
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+    #   This line of lore informs algorithm that "THIS" item has ability to increase by +15%
+    #   drop chance of 'economy item'. BUT only for 'GOLD_ORE'
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+    #   Translations for Ores
+    #
+    #   Write group of words, it will tell the Plugin specific Materials in game.
+    #   [!] The order is important!
+    #
+    #   List of blocks:
+    #   - basically all blocks in game...
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+
+    # Translations for Ores
+
+    translation_ore:
+        "bryły złota":      "GOLDEN_ORE"
+        "żelazna ruda":     "IRON_ORE"
+
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+    #   Translations for Actions
+    #
+    #   Write group of words, it will tell the Plugin specific action.
+    #   [!] The order is important!
+    #
+    #   List of actions:
+    #   - "drop rate"
+    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+
+    # Translations for Actions
+
+    translation_action:
+        "wydobycie":        "drop rate"

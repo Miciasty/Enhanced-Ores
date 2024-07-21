@@ -52,6 +52,9 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
     private File translationsFile;
     private FileConfiguration translations;
 
+    private File effectsFile;
+    private FileConfiguration effects;
+
     private SessionFactory sessionFactory;
 
     private final List<Region> regions = new ArrayList<>();
@@ -68,6 +71,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
 
         loadConfiguration();
         loadTranslations();
+        loadEffects();
 
         configureHibernate();
         loadRegionsFromDatabase();
@@ -196,7 +200,6 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
         //boolean isEnabled = config.getBoolean("EnhancedOres.settings.enabled");
         //enhancedLogger.info("Config enabled: " + isEnabled);
     }
-
     private FileConfiguration getConfigFile() {
         return config;
     }
@@ -221,9 +224,26 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
         //boolean isEnabled = translations.getBoolean("EnhancedOres.settings.enabled");
         //enhancedLogger.info("Translations enabled: " + isEnabled);
     }
-
     public FileConfiguration getTranslationsFile() {
         return translations;
+    }
+
+
+    private void loadEffects() {
+        enhancedLogger.warning("Loading effects...");
+        effectsFile = new File(getDataFolder(), "effects.yml");
+        if (!effectsFile.exists()) {
+            effectsFile.getParentFile().mkdirs();
+            saveResource("effects.yml", false);
+        }
+
+        effects = YamlConfiguration.loadConfiguration(effectsFile);
+
+        //boolean isEnabled = translations.getBoolean("EnhancedOres.settings.enabled");
+        //enhancedLogger.info("Translations enabled: " + isEnabled);
+    }
+    public FileConfiguration getEffectsFile() {
+        return effects;
     }
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- //
@@ -232,6 +252,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
         try {
             loadTranslations();
             loadConfiguration();
+            loadEffects();
             enhancedLogger.fine("Reloaded configuration");
         } catch (Exception e) {
             enhancedLogger.severe("Failed to reload configuration. - " + e);
