@@ -183,8 +183,7 @@ public class Region implements Listener {
                         other.contains(this.getPointA()) || other.contains(this.getPointB()));
     }
 
-    @Override
-    public String toString() {
+    public String longString() {
 
         StringBuilder builder = new StringBuilder();
         builder .append("\n")
@@ -193,6 +192,18 @@ public class Region implements Listener {
                 .append("World: ").append(this.getWorld().getName()).append("\n")
                 .append("PointA:").append(" X: ").append(xA).append(" Y: ").append(yA).append(" Z: ").append(zA).append("\n")
                 .append("PointB:").append(" X: ").append(xB).append(" Y: ").append(yB).append(" Z: ").append(zB).append("\n");
+
+        return builder.toString();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder .append("Region ID: ").append(this.getId()).append(", ")
+                .append("Name: ").append(this.getName()).append(", ")
+                .append("World: ").append(this.getWorld().getName()).append(", ")
+                .append("PointA:").append(" X: ").append(xA).append(" Y: ").append(yA).append(" Z: ").append(zA).append(", ")
+                .append("PointB:").append(" X: ").append(xB).append(" Y: ").append(yB).append(" Z: ").append(zB);
 
         return builder.toString();
     }

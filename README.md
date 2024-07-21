@@ -84,17 +84,22 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
         - ...
     ```
 
-- ### Drop Chance Configuration
+- ### Drop Configuration
 
-    This section configures the drop chance for the economy item.
+    This section configures the drop chance for the economy item and cooldown.
 
     - **drop-chance** - The chance (in percentage) for the economy item to drop. It can be set as an integer, float, or double. If the value is less than 1, it will be multiplied by 100. The minimum value is 0 (0%) and the maximum value is 100 (100%).
+    - **cooldown** - The time (in milliseconds) required before the same block can be mined again. It can be set as an integer, float, or double.
     <br></br>
     ```yml
     drop-chance: 25
+  
+    cooldown: 2000
     ```
 
 ## Commands
+
+- `/eo help` Shows all existing commands
 
 - `/eo list` Shows all existing regions showing their ID and Name
 

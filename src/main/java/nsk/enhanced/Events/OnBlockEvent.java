@@ -72,23 +72,23 @@ public class OnBlockEvent implements Listener {
                 List<Material> materials = PluginInstance.getInstance().getOres();
                 if (materials.contains( block.getType() )) {
 
-                    if (PluginInstance.getInstance().isMiner(player)){
-                        Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.onCooldown"),
+                    if (PluginInstance.getInstance().isMiner(player, block)){
+                        Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.onCooldown", "<error>'onCooldown' not found!"),
                                 Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                 Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                 Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
                                 Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") )));
-                        player.sendMessage(message);
+                        player.sendActionBar(message);
                         event.setCancelled(true);
                     } else {
 
-                        PluginInstance.getInstance().addMiner(player);
+                        PluginInstance.getInstance().addMiner(player, block);
 
                         if (this.mayDrop()) {
                             ItemStack economyitem = PluginInstance.getInstance().getEconomyItem();
                             player.getInventory().addItem(economyitem);
 
-                            Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.onCoinFound"),
+                            Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.onCoinFound", "<error>'onCoinFound' not found!"),
                                     Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                     Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                     Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),

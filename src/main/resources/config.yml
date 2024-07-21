@@ -31,10 +31,10 @@ EnhancedOres:
     economy-item:
         material: GOLD_NUGGET
         item-meta:
-            display-name: <!italic><gold>Golden coin
+            display-name: "<gold>Golden coin</gold>"
             lore:
-                - <gray>[-] </gray><yellow>Server currency</yellow>
-                - <gray>[-] </gray><green>Użycie -> </green><dark_green>Paying for plots, buying items.</dark_green>
+                - "<gray>[-] </gray><yellow>Server currency</yellow>"
+                - "<gray>[-] </gray><green>Użycie -> </green><dark_green>Paying for plots, buying items.</dark_green>"
 
     # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
     #   You can write name of any ore here.
@@ -62,5 +62,7 @@ EnhancedOres:
     # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
 
     # Drop chance
-
     drop-chance: 25
+
+    # Cooldown time in milliseconds
+    cooldown: 2000

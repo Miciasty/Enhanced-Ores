@@ -14,6 +14,7 @@ import nsk.enhanced.Tags.Annotations;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -134,13 +135,19 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
 
                 while (iterator.hasNext()) {
                     Miner miner = iterator.next();
-                    if (currentTime - miner.timestamp > 3000) {
+                    if (currentTime - miner.timestamp > config.getDouble("EnhancedOres.cooldown")) {
                         iterator.remove();
 
                         Player player = Bukkit.getPlayer(miner.uuid);
                         if (player != null && player.isOnline()) {
-                            Component message = MiniMessage.miniMessage().deserialize("<gold>Your cooldown passed.");
-                            player.sendMessage(message);
+
+                            Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.onCooldownPass", "<error>'onCooldownPass' not found!"),
+                                    Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
+                                    Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
+                                    Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
+                                    Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") )));
+                            player.sendActionBar(message);
+
                         }
                     }
                 }
@@ -151,20 +158,22 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
     private static class Miner {
         private final UUID uuid;
         private final long timestamp;
+        private final Location location;
 
-        public Miner(UUID uuid, long timestamp) {
+        public Miner(UUID uuid, long timestamp, Location location) {
             this.uuid = uuid;
             this.timestamp = timestamp;
+            this.location = location;
         }
     }
 
-    public void addMiner(Player player) {
-        miners.add(new Miner(player.getUniqueId(), System.currentTimeMillis()));
+    public void addMiner(Player player, Block block) {
+        miners.add(new Miner(player.getUniqueId(), System.currentTimeMillis(), block.getLocation()));
     }
 
-    public boolean isMiner(Player player) {
+    public boolean isMiner(Player player, Block block) {
         for (Miner miner : miners) {
-            if (miner.uuid == player.getUniqueId()) {
+            if (miner.uuid.equals(player.getUniqueId()) && miner.location.equals(block.getLocation())) {
                 return true;
             }
         }
@@ -456,14 +465,14 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             String displaName = config.getString("EnhancedOres.economy-item.item-meta.display-name", "<!italic><gold>Złota moneta");
-            Component displayNameComponent = MiniMessage.miniMessage().deserialize(displaName);
+            Component displayNameComponent = MiniMessage.miniMessage().deserialize("<!italic>" + displaName);
             meta.displayName(displayNameComponent);
 
             List<String> loreStrings = config.getStringList("EnhancedOres.economy-item.item-meta.lore");
             List<Component> loreComponents = new ArrayList<>();
 
             for (String lore : loreStrings) {
-                loreComponents.add(MiniMessage.miniMessage().deserialize(lore));
+                loreComponents.add(MiniMessage.miniMessage().deserialize("<!italic>" + lore));
             }
             meta.lore(loreComponents);
             item.setItemMeta(meta);
@@ -526,7 +535,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
             }
 
             if (!sender.isOp()) {
-                Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.permissionDenied"),
+                Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.permissionDenied", "<error>'permissionDenied' not found!"),
                         Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                         Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                         Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -547,7 +556,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                 case "reload":
                     reloadConfiguration();
 
-                    Component reload = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.configReloadSuccess"),
+                    Component reload = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.configReloadSuccess", "<error>'configReloadSuccess' not found!"),
                             Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                             Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                             Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -591,12 +600,12 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                     if (region.contains(l)) {
                                         n++;
                                         Component message = MiniMessage.miniMessage().deserialize("<green>ID: <gray>" + region.getId() + "</gray>, Name: <gray>" + region.getName());
-                                        Component pointA = MiniMessage.miniMessage().deserialize("<green> - " + translations.getString("EnhancedOres.messages.prefixPointA") + region.getPointAString(),
+                                        Component pointA = MiniMessage.miniMessage().deserialize("<green> - " + translations.getString("EnhancedOres.messages.prefixPointA", "<error>'prefixPointA' not found!") + region.getPointAString(),
                                                 Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                 Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                 Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
                                                 Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") )));
-                                        Component pointB = MiniMessage.miniMessage().deserialize("<green> - " + translations.getString("EnhancedOres.messages.prefixPointB") + region.getPointBString(),
+                                        Component pointB = MiniMessage.miniMessage().deserialize("<green> - " + translations.getString("EnhancedOres.messages.prefixPointB", "<error>'prefixPointB' not found!") + region.getPointBString(),
                                                 Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                 Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                 Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -613,7 +622,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                 }
 
                                 if (n <= 0) {
-                                    Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.notRegion"),
+                                    Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.notRegion", "<error>'notRegion' not found!"),
                                             Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                             Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                             Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -639,7 +648,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                                 }
 
                                                 region.setUser(player);
-                                                Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.sessionOpen"),
+                                                Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.sessionOpen", "<error>'sessionOpen' not found!"),
                                                         Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                         Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                         Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -656,7 +665,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                             if (region.getName().equalsIgnoreCase( args[2] )) {
                                                 n++;
                                                 region.setUser(player);
-                                                Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.sessionOpen"),
+                                                Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.sessionOpen", "<error>'sessionOpen' not found!"),
                                                         Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                         Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                         Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -679,7 +688,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                                 region.setName( args[2] );
                                                 region.setUser(player);
 
-                                                player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.notExistRegion"),
+                                                player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.notExistRegion", "<error>'notExistRegion' not found!"),
                                                         Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                         Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                         Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -694,7 +703,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
 
                                                 saveEntityAsync(region)
                                                         .thenAccept(success -> {
-                                                            player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.sessionOpen"),
+                                                            player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.sessionOpen", "<error>'sessionOpen' not found!"),
                                                                     Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                                     Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                                     Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -705,7 +714,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                                             throw new IllegalStateException("Query failed! ", e);
                                                         });
                                             } catch (Exception e) {
-                                                player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.queryError"),
+                                                player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.queryError", "<error>'queryError' not found!"),
                                                         Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                         Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                         Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -716,7 +725,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                         }
                                     }
                                 } else {
-                                    player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.emptyArgument"),
+                                    player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.emptyArgument", "<error>'emptyArgument' not found!"),
                                             Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                             Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                             Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -732,7 +741,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                         if (region.getUser() != null && region.getUser().equals(player.getUniqueId())) {
                                             region.resetUser();
 
-                                            player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.sessionClosed"),
+                                            player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.sessionClosed", "<error>'sessionClosed' not found!"),
                                                     Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                     Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                     Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -742,7 +751,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                     }
 
                                 } catch (Exception e) {
-                                    player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.noSession"),
+                                    player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.noSession", "<error>'noSession' not found!"),
                                             Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                             Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                             Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -763,7 +772,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                                 deleteEntityAsync(region)
                                                         .thenRun(() -> {
                                                             regions.remove(region);
-                                                            player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.removedRegion"),
+                                                            player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.removedRegion", "<error>'removedRegion' not found!"),
                                                                     Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                                     Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                                     Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -777,7 +786,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                         }
 
                                         if (x == 0) {
-                                            player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.notExistRegion"),
+                                            player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.notExistRegion", "<error>'notExistRegion' not found!"),
                                                     Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                     Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                     Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -785,7 +794,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                         }
 
                                     } catch (Exception e) {
-                                        player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.queryError"),
+                                        player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.queryError", "<error>'queryError' not found!"),
                                                 Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                 Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                 Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -793,7 +802,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                         enhancedLogger.severe(e.getMessage());
                                     }
                                 } else {
-                                    player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.emptyArgument"),
+                                    player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.emptyArgument", "<error>'emptyArgument' not found!"),
                                             Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                             Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                             Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),

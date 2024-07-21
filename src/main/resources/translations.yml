@@ -29,6 +29,7 @@ EnhancedOres:
 
     messages:
         onCooldown:             "<info>[i] <gray>You can't mine this until the cooldown ends."
+        onCooldownPass:         "<warning>[!] <gold>Your cooldown passed."
         onCoinFound:            "<success>[!] <gray>You have found a gold coin!"
 
         configReloadSuccess:    "<success>Config reloaded successfully!"

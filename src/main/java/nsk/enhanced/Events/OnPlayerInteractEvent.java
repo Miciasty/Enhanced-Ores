@@ -49,7 +49,7 @@ public class OnPlayerInteractEvent implements Listener {
 
                                     PluginInstance.getInstance().saveEntityAsync(region)
                                             .thenRun(() -> {
-                                                Component pointA = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.prefixPointA") + region.getPointAString(),
+                                                Component pointA = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.prefixPointA", "<error>'prefixPointA' not found!") + region.getPointAString(),
                                                         Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                         Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                         Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
@@ -73,7 +73,7 @@ public class OnPlayerInteractEvent implements Listener {
 
                                         PluginInstance.getInstance().saveEntityAsync(region)
                                                 .thenRun(() -> {
-                                                    Component pointB = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.prefixPointB") + region.getPointBString(),
+                                                    Component pointB = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.prefixPointB", "<error>'prefixPointB' not found!") + region.getPointBString(),
                                                             Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                             Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                             Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
