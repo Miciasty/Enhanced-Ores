@@ -22,9 +22,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,12 +32,20 @@ public class OnBlockEvent implements Listener {
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- //
 
-    private boolean mayDrop(Player player, Material blockType) {
-        Configuration config = PluginInstance.getInstance().getConfig();
-        double drop_chance = config.getDouble("EnhancedOres.drop-chance");
+    private boolean mayDrop(Player player, Material blockType, Region region, String key) {
+        FileConfiguration regionConfig = region.getConfiguration();
+        double drop_chance = regionConfig.getDouble("Drops." + key + ".drop-chance");
+
+        if (PluginInstance.getInstance().getDevmode()) {
+            PluginInstance.getInstance().getEnhancedLogger().config("Drop chance: <aqua>" + drop_chance);
+        }
 
         ItemStack tool = player.getInventory().getItemInMainHand();
         double toolDropChanceBonus = getToolDropChanceBonus(tool, blockType);
+
+        if (PluginInstance.getInstance().getDevmode()) {
+            PluginInstance.getInstance().getEnhancedLogger().config("Tool's bonus chance: <aqua>" + toolDropChanceBonus);
+        }
 
         if (drop_chance > 1) {
             drop_chance += toolDropChanceBonus;
@@ -52,6 +58,10 @@ public class OnBlockEvent implements Listener {
 
         drop_chance = Math.max(drop_chance, 0);
         drop_chance = Math.min(drop_chance, 100);
+
+        if (PluginInstance.getInstance().getDevmode()) {
+            PluginInstance.getInstance().getEnhancedLogger().config("Final drop chance: <green>" + drop_chance);
+        }
 
         Random random = new Random();
         return random.nextDouble() * 100 < drop_chance;
@@ -72,11 +82,19 @@ public class OnBlockEvent implements Listener {
 
                             String translatedOre = oreTranslations.getString(oreKey);
 
+                            if (PluginInstance.getInstance().getDevmode()) {
+                                PluginInstance.getInstance().getEnhancedLogger().config("Ore: " + translatedOre);
+                            }
+
                             if (translatedOre != null && Material.matchMaterial(translatedOre) == blocktype) {
 
                                 for (String actionKey : actionTranslations.getKeys(false)) {
 
                                     String translatedAction = actionTranslations.getString(actionKey);
+
+                                    if (PluginInstance.getInstance().getDevmode()) {
+                                        PluginInstance.getInstance().getEnhancedLogger().config("Action: " + translatedAction);
+                                    }
 
                                     if (translatedAction != null) {
 
@@ -100,6 +118,10 @@ public class OnBlockEvent implements Listener {
                                         }
 
                                         if ( matchFound ) {
+
+                                            if (PluginInstance.getInstance().getDevmode()) {
+                                                PluginInstance.getInstance().getEnhancedLogger().config("Matcher found: <green>" + translatedAction);
+                                            }
 
                                             if (translatedAction.equals("drop rate")) {
                                                 try {
@@ -143,36 +165,72 @@ public class OnBlockEvent implements Listener {
 
             if (region.contains(block.getLocation())) {
 
-                List<Material> materials = PluginInstance.getInstance().getOres();
-                if (materials.contains( block.getType() )) {
+                FileConfiguration regionConfig = region.getConfiguration();
+                ConfigurationSection section = regionConfig.getConfigurationSection("Drops");
 
-                    if (PluginInstance.getInstance().isMiner(player, block)){
-                        Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.onCooldown", "<error>'onCooldown' not found!"),
-                                Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
-                                Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
-                                Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
-                                Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") )));
-                        player.sendActionBar(message);
-                        event.setCancelled(true);
-                    } else {
+                if (section != null) {
 
-                        PluginInstance.getInstance().addMiner(player, block);
+                    Set<String> keys = section.getKeys(false);
+                    List<String> keyList = new ArrayList<>(keys);
 
-                        if (this.mayDrop(player, block.getType())) {
-                            ItemStack economyitem = PluginInstance.getInstance().getEconomyItem();
-                            player.getInventory().addItem(economyitem);
+                    for (String key : keyList) {
 
-                            Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.onCoinFound", "<error>'onCoinFound' not found!"),
-                                    Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
-                                    Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
-                                    Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
-                                    Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") )));
-                            player.sendMessage(message);
+                        if (PluginInstance.getInstance().getDevmode()) {
+                            PluginInstance.getInstance().getEnhancedLogger().config("--- --- --- --- --- --- --- ---");
+                            PluginInstance.getInstance().getEnhancedLogger().config("Region Key: <green>" + key);
                         }
+
+                        List<Material> materials = PluginInstance.getInstance().getOres(region, key);
+
+                        if (PluginInstance.getInstance().getDevmode()) {
+                            PluginInstance.getInstance().getEnhancedLogger().config("Materials: <aqua>" + materials);
+                        }
+                        if (materials.contains( block.getType() )) {
+
+                            if (PluginInstance.getInstance().getDevmode()) {
+                                PluginInstance.getInstance().getEnhancedLogger().config("--- --- --- --- --- --- --- ---");
+                            }
+
+                            if (PluginInstance.getInstance().getDevmode()) {
+                                PluginInstance.getInstance().getEnhancedLogger().config("Material found: <green>" + block.getType());
+                            }
+
+                            if (PluginInstance.getInstance().isMiner(player, block)){
+                                Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.onCooldown", "<error>'onCooldown' not found!"),
+                                        Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
+                                        Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
+                                        Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
+                                        Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") )));
+                                player.sendActionBar(message);
+                                event.setCancelled(true);
+                            } else {
+
+                                PluginInstance.getInstance().addMiner(player, block);
+
+                                if (this.mayDrop(player, block.getType(), region, key)) {
+                                    ItemStack economyitem = PluginInstance.getInstance().getEconomyItem(region, key);
+                                    player.getInventory().addItem(economyitem);
+
+                                    Component message = MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.onCoinFound", "<error>'onCoinFound' not found!"),
+                                            Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
+                                            Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
+                                            Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
+                                            Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") )));
+                                    player.sendMessage(message);
+                                }
+                            }
+
+                            event.setCancelled(true);
+                        }
+
                     }
 
-                    event.setCancelled(true);
+                } else {
+                    if (PluginInstance.getInstance().getDevmode()) {
+                        PluginInstance.getInstance().getEnhancedLogger().config("Section is null.");
+                    }
                 }
+
             }
         }
     }

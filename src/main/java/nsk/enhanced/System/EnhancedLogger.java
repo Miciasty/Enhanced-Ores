@@ -48,6 +48,9 @@ public class EnhancedLogger extends Logger {
             } else if (level == Level.FINE) {
                 Component fine = MiniMessage.miniMessage().deserialize("<gradient:#3ca800:#56f000>[Enhanced Ores]</gradient> <#aaf77f>" + message);
                 Bukkit.getConsoleSender().sendMessage(fine);
+            } else if (level == Level.CONFIG) {
+                Component dev = MiniMessage.miniMessage().deserialize("<gradient:#b28724:#ffc234>[NSK]</gradient><gradient:#1f8eb2:#2dccff> [Devmode] </gradient> <#ffe099>" + message);
+                Bukkit.getConsoleSender().sendMessage(dev);
             }
             else {
                 Bukkit.getConsoleSender().sendMessage(casual);

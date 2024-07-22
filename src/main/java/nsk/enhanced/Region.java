@@ -4,10 +4,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import javax.persistence.*;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,13 +40,21 @@ public class Region implements Listener {
     @Transient
     private UUID uuid;
 
+    @Transient
+    private File configFile;
+
+    @Transient
+    private FileConfiguration config;
+
 
     public Region() { /* Pusty konstruktor wymagany przez JPA */ }
 
-    public Region(Player player) {
+    public Region(Player player, String name) {
         try {
             setWorld( player.getLocation().getWorld() );
             setUser(player.getUniqueId());
+            setName(name);
+            initializeConfig();
         } catch ( Exception e ) {
             PluginInstance.getInstance().getEnhancedLogger().severe(e.getMessage());
         }
@@ -57,11 +70,77 @@ public class Region implements Listener {
                 setWorld(pointA.getWorld());
                 setPointA(pointA);
                 setPointB(pointB);
-
+                this.name = "region_" + pointA.getWorld().getName() + "_" + pointA.getBlockX() + "_" + pointA.getBlockZ();
+                initializeConfig();
             }
         } catch (Exception e) {
             PluginInstance.getInstance().getEnhancedLogger().severe(e.getMessage());
         }
+    }
+
+    public void initializeConfig() {
+        this.configFile = new File(PluginInstance.getInstance().getDataFolder(), "Regions" + File.separator + name + ".yml");
+        if (!configFile.exists()) {
+            try {
+                configFile.getParentFile().mkdirs();
+                if (PluginInstance.getInstance().getDevmode()) {
+                    PluginInstance.getInstance().getEnhancedLogger().config("Initializing <green>" + name + "</green> regional configuration file...");
+                }
+                createDefaultConfig();
+            } catch (Exception e) {
+                PluginInstance.getInstance().getEnhancedLogger().severe(e.getMessage());
+            }
+        } else {
+            PluginInstance.getInstance().getEnhancedLogger().warning("Loading <green>" + name + "</green> regional configuration file!");
+        }
+
+        this.config = YamlConfiguration.loadConfiguration(configFile);
+
+    }
+
+    public void createDefaultConfig() {
+        if (!configFile.exists()) {
+            try {
+                configFile.getParentFile().mkdirs();
+                configFile.createNewFile();
+
+                File templateFile = new File(PluginInstance.getInstance().getDataFolder(), "Regions" + File.separator + "example.yml");
+                if (!templateFile.exists()) {
+                    templateFile.getParentFile().mkdirs();
+                    PluginInstance.getInstance().saveResource("Regions" + File.separator + "example.yml", false);
+                } else {
+                    Files.copy(templateFile.toPath(), configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                config = YamlConfiguration.loadConfiguration(templateFile);
+
+                if (PluginInstance.getInstance().getDevmode()) {
+                    PluginInstance.getInstance().getEnhancedLogger().config("Creating regional configuration file for <green>" + name + ".yml");
+                }
+
+                //saveConfig();
+
+            } catch (Exception e) {
+                PluginInstance.getInstance().getEnhancedLogger().severe(e.getMessage());
+            }
+        }
+    }
+
+    public void saveConfig() {
+        try {
+            config.save(configFile);
+        } catch (Exception e) {
+            PluginInstance.getInstance().getEnhancedLogger().severe(e.getMessage());
+        }
+    }
+
+    public void loadConfiguration() {
+        PluginInstance.getInstance().getEnhancedLogger().warning("Reloading <aqua>" + name + "</aqua> regional configuration...");
+        initializeConfig();
+    }
+
+    public FileConfiguration getConfiguration() {
+        return config;
     }
 
     // --- --- --- --- // Setter's / Getter's // --- --- --- --- //
@@ -127,6 +206,12 @@ public class Region implements Listener {
         this.zB = pointB.getZ();
     }
 
+    public FileConfiguration getConfig() {
+        return config;
+    }
+
+    // --- --- --- --- // Methods // --- --- --- --- //
+
     public boolean contains(Location location) {
         if (!location.getWorld().getName().equals(worldName)) {
             return false;
@@ -148,8 +233,6 @@ public class Region implements Listener {
                 z >= minZ && z <= maxZ;
     }
 
-
-    // --- --- --- --- // Methods // --- --- --- --- //
 
     public List<Block> getBlocks() {
         List<Block> blocks = new ArrayList<>();

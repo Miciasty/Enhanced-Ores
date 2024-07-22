@@ -13,8 +13,8 @@ Easy management, efficiently and configurably.
 
 ## Configuration
 
-To configure the Enhanced Ores plugin, edit the config.yml file located in the plugin's directory.
-
+To configure the Enhanced Ores plugin, edit the `config.yml` file located in the plugin's directory. To configure each regions, edit the `[region_name].yml` located in Regions directory.
+### `config.yml`
 - ### Database Configuration
 
     This section configures the database connection parameters used by the plugin to store and retrieve data.
@@ -50,8 +50,14 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
         format_sql:     true
         sql_comments:   true
     ```
-  
-- ### Economy Item
+---
+### `Regions/[region_name].yml`
+
+Each region now has its own dedicated configuration file, allowing for independent and more manageable settings. Instead of a single, general `config.yml` file for all regions, each region's parameters are now stored in its own `[region_name].yml` file within the Regions directory.
+
+You can now configure multiple items to be dropped within each region. For more details on how to set this up, please refer to the region's configuration file.
+
+- ### Example item
 
     This section configures the item that will be dropped from the specified ores.
 
@@ -61,7 +67,7 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
     - **lore** - A list of lore lines for the item.
     <br></br>
     ```yml
-    economy-item:
+    example-item:
         material: GOLD_NUGGET
         item-meta:
             display-name: <!italic><gold>Golden coin
@@ -70,35 +76,35 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
                 - <gray>[-] </gray><green>Usage -> </green><dark_green>Paying for plots, buying items.</dark_green>
     ```
 
-- ### Ores Configuration
+  - ### Ores Configuration
 
-    This section specifies which ores can drop the configured economy item.
+      This section specifies which blocks can drop the configured item.
 
-    - **ores** - A list of ores from which the economy item can drop. Only blocks whose names end with **_ORE** can be used.
-    <br></br>
-    ```yml
-    ores:
-        - DEEPSLATE_GOLD
-        - GOLD
-        - IRON
-        - ...
-    ```
+      - **ores** - A list of blocks from which the item can drop.
+      <br></br>
+      ```yml
+      ores:
+          - DEEPSLATE_GOLD_ORE
+          - GOLD_ORE
+          - IRON_ORE
+          - ...
+      ```
 
-- ### Drop Configuration
+  - ### Drop Configuration
 
-    This section configures the drop chance for the economy item and cooldown.
+      This section configures the drop chance for the item and cooldown.
 
-    - **drop-chance** - The chance (in percentage) for the economy item to drop. It can be set as an integer, float, or double. If the value is less than 1, it will be multiplied by 100. The minimum value is 0 (0%) and the maximum value is 100 (100%).
-    - **cooldown** - The time (in milliseconds) required before the same block can be mined again. It can be set as an integer, float, or double.
-    <br></br>
-    ```yml
-    drop-chance: 25
+      - **drop-chance** - The chance (in percentage) for the item to drop. It can be set as an integer, float, or double. If the value is less than 1, it will be multiplied by 100. The minimum value is 0 (0%) and the maximum value is 100 (100%).
+      - **cooldown** - The time (in milliseconds) required before the same block can be mined again. It can be set as an integer, float, or double.
+      <br></br>
+      ```yml
+      drop-chance: 25
   
-    cooldown: 2000
-    ```
+      cooldown: 2000
+      ```
 
 ---
-
+### `effects.yml`
 - ### Tools Effects Configuration
 
     This section configures the effects that tools can have on the drop rate of economy items. Effects are based on lore strings that describe the bonuses.
@@ -122,6 +128,8 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
 
 - `/eo help` Shows all existing commands
 
+- `/eo reload` Reloads all configuration files, includes regional configuration files.
+
 - `/eo list` Shows all existing regions showing their ID and Name
 
 - `/eo region **check**` Checks player's location and searching if any region contains it. If true, sending message with information about ID, Name, World, PointA, PointB of the Region.
@@ -134,6 +142,11 @@ To configure the Enhanced Ores plugin, edit the config.yml file located in the p
 - `/eo region **close**` Closes Player's active session.
 
 - `/eo region **remove** < id / name >` Removes existing region.
+
+> [!TIP]
+> If you are interested in actually knowing if something really works or not. You can always enable 'Devmode' and check new informations in Console.
+
+- `/eo devmode` enables / disables devmode.
 
 ## Support
 

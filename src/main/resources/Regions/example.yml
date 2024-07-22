@@ -1,0 +1,78 @@
+
+# Enhanced Ores - Regional Configuration File
+
+Drops:
+
+    # Example Item 1
+
+    example-1:
+        material: IRON_NUGGET
+        item-meta:
+            display-name: "<gold>Iron coin</gold>"
+            lore:
+                - "<gray>[-] </gray><yellow>Server currency</yellow>"
+                - "<gray>[-] </gray><green>Usage -> </green><dark_green>Paying for plots, buying items.</dark_green>"
+
+        # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+        #   You can write name of any block here.
+        # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+
+        # Ores from which drops the item
+
+        ores:
+            - IRON_ORE
+        #   - GOLD_ORE
+        #   - ...
+
+        # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+        #   Minimum drop chance is "0" - 0%         // it will not change no matter what you do!
+        #   Maximum drop chance is "100" - 100%     // it will not change no matter what you do!
+        #
+        #   You can use number types of Integer, Float and Double.
+        #   If you will set "drop-chance" under 1, the logic behind it will multiply it by 100.
+        #
+        #   Example: 0.95 -> 95% | 1 -> 1% | 55 -> 55%
+        # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+
+        # Drop chance
+        drop-chance: 15
+
+        # Cooldown time in milliseconds
+        cooldown: 1000
+
+    # Example Item 2
+
+    example-2:
+        material: GOLD_NUGGET
+        item-meta:
+            display-name: "<gold>Golden coin</gold>"
+            lore:
+                - "<gray>[-] </gray><yellow>Server currency</yellow>"
+                - "<gray>[-] </gray><green>Usage -> </green><dark_green>Paying for plots, buying items.</dark_green>"
+
+        # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+        #   You can write name of any block here.
+        # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+
+        # Ores from which drops the item
+
+        ores:
+            - GOLD_ORE
+        #   - IRON_ORE
+        #   - ...
+
+        # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+        #   Minimum drop chance is "0" - 0%         // it will not change no matter what you do!
+        #   Maximum drop chance is "100" - 100%     // it will not change no matter what you do!
+        #
+        #   You can use number types of Integer, Float and Double.
+        #   If you will set "drop-chance" under 1, the logic behind it will multiply it by 100.
+        #
+        #   Example: 0.95 -> 95% | 1 -> 1% | 55 -> 55%
+        # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
+
+        # Drop chance
+        drop-chance: 45
+
+        # Cooldown time in milliseconds
+        cooldown: 2000

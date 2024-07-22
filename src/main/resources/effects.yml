@@ -3,21 +3,20 @@
 EnhancedOres:
 
     # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
-    #   Basically you are writing here Keywords for plugin, thanks to that it will know
-    #   what to do later.
+    #   This section defines the translations for ores and actions. The algorithm works with
+    #    wo variables [OreKey] and [ActionKey], which must be placed directly next to each other
+    #    in the lore string.
     #
-    #   This algorithm works with 2 variables [OreKey], [ActionKey] you can mix them in sentences.
-    #   What important is that those 2 keywords are building a 'sentence' that you
-    #   have to close using '%' for example:
+    #   If you place any other text between these keys, the effect will not be applied!
     #
-    # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
-    #   Example lore sentence: Zwiększa `wydobycie` z `bloków złota` o `+15%`                       #
-    #                                                                                          #
-    #   translation_ore:                                                                       #
-    #       "bloków złota":     "GOLDEN_ORE"                                                   #
-    #                                                                                          #
-    #   translation_action:                                                                    #
-    #       "wydobycie":        "drop rate"                                                    #
+    #   Example lore sentence: Zwiększa `wydobycie` `bloków złota` o `+15%`
+    #
+    #   translation_ore:
+    #       "bloków złota":     "GOLD_ORE"
+    #
+    #   translation_action:
+    #       "wydobycie":        "drop rate"
+    #
     # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #
     #   This line of lore informs algorithm that "THIS" item has ability to increase by +15%
     #   drop chance of 'economy item'. BUT only for 'GOLD_ORE'
@@ -36,7 +35,7 @@ EnhancedOres:
     # Translations for Ores
 
     translation_ore:
-        "bryły złota":      "GOLDEN_ORE"
+        "bryły złota":      "GOLD_ORE"
         "żelazna ruda":     "IRON_ORE"
 
     # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- # ---- #

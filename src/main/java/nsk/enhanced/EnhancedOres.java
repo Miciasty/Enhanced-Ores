@@ -1,12 +1,9 @@
 package nsk.enhanced;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import nsk.enhanced.Events.OnBlockEvent;
 import nsk.enhanced.Events.OnPlayerInteractEvent;
 import nsk.enhanced.System.EnhancedLogger;
@@ -30,17 +27,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.yaml.snakeyaml.Yaml;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public final class EnhancedOres extends JavaPlugin implements Listener, CommandExecutor {
 
@@ -60,6 +54,8 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
     private final List<Region> regions = new ArrayList<>();
     private final List<Miner> miners = new ArrayList<>();
 
+    private boolean devmove = false;
+
     @Override
     public void onEnable() {
 
@@ -67,11 +63,11 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
 
         enhancedLogger = new EnhancedLogger(this);
 
-        enhancedLogger.info("test");
-
         loadConfiguration();
         loadTranslations();
         loadEffects();
+
+        createRegionsFolder();
 
         configureHibernate();
         loadRegionsFromDatabase();
@@ -228,7 +224,6 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
         return translations;
     }
 
-
     private void loadEffects() {
         enhancedLogger.warning("Loading effects...");
         effectsFile = new File(getDataFolder(), "effects.yml");
@@ -246,6 +241,14 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
         return effects;
     }
 
+    private void createRegionsFolder() {
+        File regionsFolder = new File(getDataFolder(), "Regions");
+        if (!regionsFolder.exists()) {
+            regionsFolder.mkdirs();
+        }
+
+    }
+
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- //
 
     private void reloadConfiguration() {
@@ -254,6 +257,16 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
             loadConfiguration();
             loadEffects();
             enhancedLogger.fine("Reloaded configuration");
+            enhancedLogger.info("Preparing to reload all regional configurations.");
+
+            for (Region region : regions) {
+                try {
+                    region.loadConfiguration();
+                } catch (Exception e) {
+                    enhancedLogger.severe("Failed to reload regional configuration: " + region.getName() + " " + e.getMessage());
+                }
+            }
+
         } catch (Exception e) {
             enhancedLogger.severe("Failed to reload configuration. - " + e);
         }
@@ -316,6 +329,9 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
             query.from(Region.class);
 
             List<Region> result = session.createQuery(query).getResultList();
+            for (Region region : result) {
+                region.initializeConfig();
+            }
             regions.addAll(result);
 
             session.getTransaction().commit();
@@ -474,8 +490,9 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- //
 
-    public ItemStack getEconomyItem() {
-        String materialName = config.getString("EnhancedOres.economy-item.material", "GOLD_NUGGET");
+    public ItemStack getEconomyItem(Region region, String key) {
+        FileConfiguration regionConfig = region.getConfiguration();
+        String materialName = regionConfig.getString("Drops." + key + ".material", "GOLD_NUGGET");
         Material material = Material.getMaterial(materialName);
 
         if (material == null) {
@@ -485,11 +502,11 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            String displaName = config.getString("EnhancedOres.economy-item.item-meta.display-name", "<!italic><gold>Złota moneta");
+            String displaName = regionConfig.getString("Drops." + key + ".item-meta.display-name", "<!italic><gold>Złota moneta");
             Component displayNameComponent = MiniMessage.miniMessage().deserialize("<!italic>" + displaName);
             meta.displayName(displayNameComponent);
 
-            List<String> loreStrings = config.getStringList("EnhancedOres.economy-item.item-meta.lore");
+            List<String> loreStrings = regionConfig.getStringList("Drops." + key + ".item-meta.lore");
             List<Component> loreComponents = new ArrayList<>();
 
             for (String lore : loreStrings) {
@@ -502,12 +519,13 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
         return item;
     }
 
-    public List<Material> getOres() {
-        List<String> materialName = config.getStringList("EnhancedOres.ores");
+    public List<Material> getOres(Region region, String key) {
+        FileConfiguration regionConfig = region.getConfiguration();
+        List<String> materialName = regionConfig.getStringList("Drops." + key + ".ores");
         List<Material> materials = new ArrayList<>();
 
         for (String material : materialName) {
-            materials.add(Material.getMaterial( material.toUpperCase() + "_ORE" ));
+            materials.add(Material.getMaterial( material.toUpperCase() ));
         }
 
         return materials;
@@ -545,6 +563,10 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
         return stringBuilder.toString();
     }
 
+    public boolean getDevmode() {
+        return devmove;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("eo")) {
@@ -566,6 +588,28 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
             }
 
             switch (args[0].toLowerCase()) {
+
+                case "devmode":
+
+                    String dev;
+
+                    if (devmove) {
+                        devmove = false;
+                        dev = "is now disabled.";
+                    } else {
+                        devmove = true;
+                        dev = "is now enabled.";
+                    }
+
+                    Component status = MiniMessage.miniMessage().deserialize(("<gradient:#b28724:#ffc234>[Enhanced Ores]</gradient> <#ffe099>" + dev),
+                            Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
+                            Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
+                            Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
+                            Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") )));
+
+                    sender.sendMessage(status);
+
+                    break;
 
                 case "help":
 
@@ -705,8 +749,7 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                                     }
                                                 }
 
-                                                Region region = new Region(player);
-                                                region.setName( args[2] );
+                                                Region region = new Region(player, args[2]);
                                                 region.setUser(player);
 
                                                 player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.notExistRegion", "<error>'notExistRegion' not found!"),
@@ -729,6 +772,8 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                                                     Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
                                                                     Placeholder.styling("success", TextColor.fromHexString( Annotations.getTag("success") )),
                                                                     Placeholder.styling("info", TextColor.fromHexString( Annotations.getTag("info") ))));
+
+                                                            region.createDefaultConfig();
                                                         })
                                                         .exceptionally(e -> {
                                                             regions.remove(region);
@@ -791,8 +836,19 @@ public final class EnhancedOres extends JavaPlugin implements Listener, CommandE
                                                 x++;
 
                                                 deleteEntityAsync(region)
-                                                        .thenRun(() -> {
+                                                        .thenAccept(success -> {
                                                             regions.remove(region);
+
+                                                            File configFile = new File(getDataFolder(), "Regions" + File.separator + region.getName() + ".yml");
+
+                                                            if (configFile.exists()) {
+                                                                if (configFile.delete()) {
+                                                                    enhancedLogger.fine("Successfully deleted regional configuration " + region.getName());
+                                                                } else {
+                                                                    enhancedLogger.severe("Failed to delete regional configuration " + region.getName());
+                                                                }
+                                                            }
+
                                                             player.sendMessage(MiniMessage.miniMessage().deserialize(translations.getString("EnhancedOres.messages.removedRegion", "<error>'removedRegion' not found!"),
                                                                     Placeholder.styling("error", TextColor.fromHexString( Annotations.getTag("error") )),
                                                                     Placeholder.styling("warning", TextColor.fromHexString( Annotations.getTag("warning") )),
