@@ -220,6 +220,8 @@ public class OnBlockEvent implements Listener {
                                 }
                             }
 
+                            reduceItemDurability(player);
+
                             event.setCancelled(true);
                         }
 
@@ -250,6 +252,18 @@ public class OnBlockEvent implements Listener {
                 }
             }
         }
+    }
+
+    private void reduceItemDurability(Player player) {
+
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+
+        if (itemInHand.getType() != Material.AIR && itemInHand.getType().getMaxDurability() > 0) {
+
+            itemInHand.setDurability( (short) (itemInHand.getDurability() + 1) );
+
+        }
+
     }
 
 }
