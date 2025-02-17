@@ -30,7 +30,7 @@ public class Region implements Listener {
 
     @Column(nullable = true)
     private double xA, yA, zA;
-
+ 
     @Column(nullable = true)
     private double xB, yB, zB;
 
